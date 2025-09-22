@@ -73,7 +73,7 @@ class DataProcessor:
             raise
 
     def extract_info_from_name(self, df: pd.DataFrame) -> pd.DataFrame:
-        """从简称中提取分类、配置、尺寸、速别、颜色信息"""
+        """从简称中提取分类、配置、尺寸、速别信息"""
         # 新增列
         df['提取的分类'] = ''
         df['配置'] = ''
@@ -104,70 +104,115 @@ class DataProcessor:
                     size_end = match.end()
                     break
 
+            # 查找速别
+            speed_match = re.search(self.speed_pattern, name)
+            speed_text = ''
+            speed_start = -1
+            speed_end = -1
+            if speed_match:
+                speed_text = speed_match.group()
+                speed_start = speed_match.start()
+                speed_end = speed_match.end()
+                df.at[index, '速别'] = speed_text
+
             if size_match:
                 df.at[index, '尺寸'] = size_match
-
-                # 提取配置
+                
+                # 构建配置名：除了分类、尺寸、速别外的所有文字
+                config_parts = []
+                
+                # 分类前的部分
                 if category in name:
-                    category_end = name.find(category) + len(category)
-                    config_part = name[category_end:size_start].strip()
-                    config_part = re.sub(r'^[^\w]+|[^\w]+$', '', config_part)
-                    df.at[index, '配置'] = config_part
+                    category_start = name.find(category)
+                    if category_start > 0:
+                        before_category = name[:category_start].strip()
+                        if before_category:
+                            config_parts.append(before_category)
+                    
+                    # 分类后到尺寸前的部分
+                    category_end = category_start + len(category)
+                    between_part = name[category_end:size_start].strip()
+                    if between_part:
+                        config_parts.append(between_part)
                 else:
-                    config_part = name[:size_start].strip()
-                    config_part = re.sub(r'^[^\w]+|[^\w]+$', '', config_part)
-                    df.at[index, '配置'] = config_part
-
-                # 提取速别和颜色
+                    # 没有分类，取尺寸前的部分
+                    before_size = name[:size_start].strip()
+                    if before_size:
+                        config_parts.append(before_size)
+                
+                # 尺寸后的部分（排除速别）
                 after_size = name[size_end:].strip()
-                self._extract_speed_and_color(df, index, after_size)
+                if after_size:
+                    if speed_match and speed_start >= size_end:
+                        # 尺寸后到速别前的部分
+                        between_size_speed = name[size_end:speed_start].strip()
+                        if between_size_speed:
+                            config_parts.append(between_size_speed)
+                        
+                        # 速别后的部分
+                        after_speed = name[speed_end:].strip()
+                        if after_speed:
+                            config_parts.append(after_speed)
+                    else:
+                        # 没有速别或速别在尺寸前，直接添加尺寸后的部分
+                        config_parts.append(after_size)
+                
+                # 拼接配置名
+                df.at[index, '配置'] = ''.join(config_parts)
 
             else:
-                # 如果没有尺寸信息
-                speed_match = re.search(self.speed_pattern, name)
-                if speed_match:
-                    df.at[index, '速别'] = speed_match.group()
+                # 如果没有尺寸信息，整个简称（除了分类和速别）都是配置
+                config_parts = []
                 
                 if category in name:
-                    category_end = name.find(category) + len(category)
-                    config_part = name[category_end:].strip()
-                    if config_part:
-                        df.at[index, '配置'] = config_part
+                    # 分类前的部分
+                    category_start = name.find(category)
+                    if category_start > 0:
+                        before_category = name[:category_start].strip()
+                        if before_category:
+                            config_parts.append(before_category)
+                    
+                    # 分类后的部分（排除速别）
+                    category_end = category_start + len(category)
+                    after_category = name[category_end:].strip()
+                    
+                    if speed_match:
+                        if speed_start > category_end:
+                            # 分类后到速别前的部分
+                            between_part = name[category_end:speed_start].strip()
+                            if between_part:
+                                config_parts.append(between_part)
+                        
+                        # 速别后的部分
+                        after_speed = name[speed_end:].strip()
+                        if after_speed:
+                            config_parts.append(after_speed)
+                    else:
+                        # 没有速别，直接添加分类后的部分
+                        if after_category:
+                            config_parts.append(after_category)
+                else:
+                    # 没有分类，整个简称（除了速别）都是配置
+                    if speed_match:
+                        # 速别前的部分
+                        before_speed = name[:speed_start].strip()
+                        if before_speed:
+                            config_parts.append(before_speed)
+                        
+                        # 速别后的部分
+                        after_speed = name[speed_end:].strip()
+                        if after_speed:
+                            config_parts.append(after_speed)
+                    else:
+                        # 没有速别，整个简称都是配置
+                        config_parts.append(name.strip())
+                
+                # 拼接配置名
+                df.at[index, '配置'] = ''.join(config_parts)
+        
         return df
 
-    def _extract_speed_and_color(self, df: pd.DataFrame, index: int, text: str):
-        """提取速别和颜色信息"""
-        # 查找速别
-        speed_match = re.search(self.speed_pattern, text)
-        if speed_match:
-            speed_text = speed_match.group()
-            speed_start = speed_match.start()
-            speed_end = speed_match.end()
-            df.at[index, '速别'] = speed_text
 
-            # 提取颜色
-            after_speed = text[speed_end:].strip()
-            if after_speed:
-                color_found = False
-                for color_pattern in self.color_patterns:
-                    if re.search(color_pattern, after_speed):
-                        df.at[index, '颜色'] = after_speed
-                        color_found = True
-                        break
-                
-                if not color_found and after_speed:
-                    df.at[index, '颜色'] = after_speed
-        else:
-            # 尝试其他格式的速别
-            alt_speed_match = re.search(r'(\d+)[^\d]*速', text)
-            if alt_speed_match:
-                speed_text = f"{alt_speed_match.group(1)}速"
-                df.at[index, '速别'] = speed_text
-                remaining = text[alt_speed_match.end():].strip()
-                if remaining:
-                    df.at[index, '颜色'] = remaining
-            else:
-                df.at[index, '速别'] = text
 
     def generate_profit_table(self, df: pd.DataFrame) -> pd.DataFrame:
         """生成毛利表"""

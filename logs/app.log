@@ -1162,3 +1162,10 @@
 2025-09-22 14:04:35,097 - utils.logger - INFO - 价格更新完成！匹配成功: 220行, 未匹配: 1行
 2025-09-22 14:04:35,109 - utils.logger - INFO - 新毛利率计算完成（已包含快递费30元）
 2025-09-22 14:04:38,862 - utils.logger - INFO - 原始数据已导出到: C:/Users/Administrator/Desktop/excelutil/12.xlsx
+2025-09-22 14:21:00,461 - utils.logger - INFO - 成功导入数据，共288行，ID列已保持为字符串格式
+2025-09-22 14:21:00,469 - utils.logger - INFO - 数据处理完成，共50行
+2025-09-22 14:21:00,507 - utils.logger - INFO - 毛利表生成完成，共24行
+2025-09-22 14:21:11,994 - utils.logger - INFO - 成功合并列 配置 (索引: 1)
+2025-09-22 14:21:11,994 - utils.logger - INFO - 成功合并列 速别 (索引: 2)
+2025-09-22 14:21:11,995 - utils.logger - INFO - 成功合并列 价格 (索引: 3)
+2025-09-22 14:21:12,015 - utils.logger - INFO - 毛利表已导出到: C:/Users/Administrator/Desktop/excelutil/1.xlsx
