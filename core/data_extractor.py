@@ -58,16 +58,21 @@ class DataExtractor:
                     size_end = match.end()
                     break
 
-            # 查找速别
-            speed_match = re.search(self.speed_pattern, name)
-            speed_text = ''
+            # 查找速别 - 使用新的提取逻辑
+            speed_text = self.extract_speed_from_name(name)
+            df.at[index, '速别'] = speed_text
+            
+            # 为了保持原有逻辑，仍需要找到速别在字符串中的位置
             speed_start = -1
             speed_end = -1
-            if speed_match:
-                speed_text = speed_match.group()
-                speed_start = speed_match.start()
-                speed_end = speed_match.end()
-                df.at[index, '速别'] = speed_text
+            speed_match = None
+            if speed_text and speed_text != "单速":
+                # 查找速别在原字符串中的位置
+                speed_pattern_for_position = re.escape(speed_text)
+                speed_match = re.search(speed_pattern_for_position, name)
+                if speed_match:
+                    speed_start = speed_match.start()
+                    speed_end = speed_match.end()
 
             if size_match:
                 df.at[index, '尺寸'] = size_match
@@ -178,9 +183,30 @@ class DataExtractor:
         return ''
 
     def extract_speed_from_name(self, name: str) -> str:
-        """从商品简称中提取速别"""
-        speed_match = re.search(self.speed_pattern, name)
-        return speed_match.group() if speed_match else ''
+        """从商品简称中提取速别
+        
+        规则：
+        1. 查找"速"字前面的数字或汉字
+        2. 如果没有"速"字，默认为"单速"
+        """
+        if pd.isna(name) or not name or name == 'nan':
+            return "单速"
+        
+        name = str(name)
+        
+        # 查找"速"字
+        if '速' not in name:
+            return "单速"
+        
+        # 查找"速"字前面的数字或汉字
+        # 匹配模式：数字+速 或 汉字+速（包括"变"字等其他汉字）
+        speed_match = re.search(r'([0-9一二三四五六七八九十百千万变内外前后高低快慢多少]+)速', name)
+        if speed_match:
+            speed_value = speed_match.group(1)
+            return f"{speed_value}速"
+        
+        # 如果有"速"字但没有匹配到前面的数字或汉字，默认为单速
+        return "单速"
 
     def extract_size_from_name(self, name: str) -> str:
         """从商品简称中提取尺寸"""

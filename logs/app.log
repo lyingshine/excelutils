@@ -1517,3 +1517,34 @@
 2025-09-22 17:37:14,583 - utils.logger - INFO - 数据处理完成，共84行
 2025-09-22 17:37:14,656 - utils.logger - INFO - 毛利表生成完成，共48行
 2025-09-22 17:37:16,389 - utils.logger - INFO - 应用程序正常退出
+2025-09-22 17:42:06,363 - utils.logger - INFO - 启动毛利表生成器应用程序
+2025-09-22 17:42:22,900 - utils.logger - INFO - 成功导入数据，共99行，ID列已保持为字符串格式
+2025-09-22 17:42:22,913 - utils.logger - INFO - 数据处理完成，共24行
+2025-09-22 17:42:22,946 - utils.logger - INFO - 毛利表生成完成，共0行
+2025-09-22 17:44:58,430 - utils.logger - INFO - 应用程序正常退出
+2025-09-22 17:48:40,615 - utils.logger - INFO - 启动毛利表生成器应用程序
+2025-09-22 17:48:44,870 - utils.logger - INFO - 成功导入数据，共99行，ID列已保持为字符串格式
+2025-09-22 17:48:44,881 - utils.logger - ERROR - 数据处理失败: cannot access local variable 'speed_match' where it is not associated with a value
+2025-09-22 17:50:27,697 - utils.logger - INFO - 应用程序正常退出
+2025-09-22 17:50:32,996 - utils.logger - INFO - 启动毛利表生成器应用程序
+2025-09-22 17:50:36,998 - utils.logger - INFO - 成功导入数据，共99行，ID列已保持为字符串格式
+2025-09-22 17:50:37,011 - utils.logger - INFO - 数据处理完成，共24行
+2025-09-22 17:50:37,054 - utils.logger - INFO - 毛利表生成完成，共14行
+2025-09-22 17:50:54,105 - utils.logger - INFO - 成功合并列 配置 (索引: 1)
+2025-09-22 17:50:54,106 - utils.logger - INFO - 成功合并列 速别 (索引: 2)
+2025-09-22 17:50:54,106 - utils.logger - INFO - 成功合并列 价格 (索引: 3)
+2025-09-22 17:50:54,114 - utils.logger - INFO - 毛利表已导出到: C:/Users/Administrator/Desktop/excelutils/1.xlsx
+2025-09-22 17:52:52,246 - utils.logger - INFO - 应用程序正常退出
+2025-09-22 17:53:03,377 - utils.logger - INFO - 启动毛利表生成器应用程序
+2025-09-22 17:53:07,075 - utils.logger - INFO - 成功导入数据，共99行，ID列已保持为字符串格式
+2025-09-22 17:53:07,089 - utils.logger - INFO - 数据处理完成，共24行
+2025-09-22 17:53:07,132 - utils.logger - INFO - 毛利表生成完成，共14行
+2025-09-22 17:53:27,220 - utils.logger - ERROR - 导出毛利表失败: [Errno 13] Permission denied: 'C:/Users/Administrator/Desktop/excelutils/1.xlsx'
+2025-09-22 17:53:39,565 - utils.logger - INFO - 成功导入数据，共99行，ID列已保持为字符串格式
+2025-09-22 17:53:39,569 - utils.logger - INFO - 数据处理完成，共24行
+2025-09-22 17:53:39,605 - utils.logger - INFO - 毛利表生成完成，共14行
+2025-09-22 17:53:42,495 - utils.logger - INFO - 成功合并列 配置 (索引: 1)
+2025-09-22 17:53:42,496 - utils.logger - INFO - 成功合并列 速别 (索引: 2)
+2025-09-22 17:53:42,496 - utils.logger - INFO - 成功合并列 价格 (索引: 3)
+2025-09-22 17:53:42,506 - utils.logger - INFO - 毛利表已导出到: C:/Users/Administrator/Desktop/excelutils/1.xlsx
+2025-09-22 17:54:50,631 - utils.logger - INFO - 应用程序正常退出
