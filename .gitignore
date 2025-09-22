@@ -115,16 +115,14 @@ dmypy.json
 ehthumbs.db
 Thumbs.db
 
-# Excel files (except sample data)
-*.xlsx
-*.xls
-!导入数据.xlsx
-
-# Log files
-logs/*.log
-!logs/.gitkeep
-
-# Temporary files
+# Excel temporary files
 ~$*.xlsx
 ~$*.xls
+
+# Project specific
+logs/*.log
+data/temp/
 *.tmp
+
+# CodeBuddy
+.codebuddy/

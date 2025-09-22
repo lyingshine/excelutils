@@ -8,6 +8,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 try:
     from gui.main_window import MainWindow
+    from utils.logger import logger
 except ImportError as e:
     print(f"导入错误: {e}")
     print("请确保所有模块文件都存在")
@@ -15,9 +16,16 @@ except ImportError as e:
 
 def main():
     """应用程序主入口"""
-    root = tk.Tk()
-    app = MainWindow(root)
-    app.run()
+    try:
+        logger.info("启动毛利表生成器应用程序")
+        root = tk.Tk()
+        app = MainWindow(root)
+        app.run()
+        logger.info("应用程序正常退出")
+    except Exception as e:
+        logger.error(f"应用程序启动失败: {e}")
+        print(f"应用程序启动失败: {e}")
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()

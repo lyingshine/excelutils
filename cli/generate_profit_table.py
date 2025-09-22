@@ -1,8 +1,12 @@
 import pandas as pd
-from data_processor import DataProcessor
-from excel_exporter import ExcelExporter
 import sys
 import os
+
+# 添加项目根目录到Python路径
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from processors.data_processor import DataProcessor
+from exporters.excel_exporter import ExcelExporter
 
 def main():
     """命令行版本：直接生成毛利表Excel文件"""

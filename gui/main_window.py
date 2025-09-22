@@ -6,14 +6,15 @@ import os
 from typing import Optional
 
 # 添加项目根目录到Python路径
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(project_root)
 
 try:
-    from data_processor import DataProcessor
-    from excel_exporter import ExcelExporter
+    from processors.data_processor import DataProcessor
+    from exporters.excel_exporter import ExcelExporter
 except ImportError as e:
     print(f"导入错误: {e}")
-    print("请确保data_processor.py和excel_exporter.py文件存在")
+    print("请确保processors/data_processor.py和exporters/excel_exporter.py文件存在")
     raise
 
 class MainWindow:
