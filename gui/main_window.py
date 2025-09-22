@@ -19,9 +19,18 @@ except ImportError as e:
 class MainWindow:
     def __init__(self, root):
         self.root = root
-        self.root.title("毛利表生成器")
-        self.root.geometry("1200x800")
+        self.root.title("毛利表生成器 - Excel数据处理工具")
+        self.root.geometry("1400x900")
         self.root.resizable(True, True)
+        
+        # 设置现代化主题
+        self.setup_theme()
+        
+        # 设置窗口图标和样式
+        self.root.configure(bg='#f8f9fa')
+        
+        # 居中显示窗口
+        self.center_window()
 
         # 数据处理器和导出器
         self.data_processor = DataProcessor()
@@ -32,52 +41,190 @@ class MainWindow:
         self.processed_data = None
         self.profit_table_data = None
         self.updated_data = None
+        
+        # 初始化UI组件
+        self.profit_tree = None
 
         self.setup_ui()
 
+    def setup_theme(self):
+        """设置现代化主题"""
+        style = ttk.Style()
+        
+        # 设置主题
+        style.theme_use('clam')
+        
+        # 自定义样式
+        style.configure('Title.TLabel', 
+                       font=('Microsoft YaHei UI', 24, 'bold'),
+                       foreground='#2c3e50',
+                       background='#f8f9fa')
+        
+        style.configure('Subtitle.TLabel',
+                       font=('Microsoft YaHei UI', 12),
+                       foreground='#7f8c8d',
+                       background='#f8f9fa')
+        
+        style.configure('Modern.TButton',
+                       font=('Microsoft YaHei UI', 10),
+                       padding=(20, 10),
+                       relief='flat')
+        
+        style.map('Modern.TButton',
+                 background=[('active', '#3498db'),
+                           ('pressed', '#2980b9'),
+                           ('!active', '#ecf0f1')])
+        
+        style.configure('Status.TLabel',
+                       font=('Microsoft YaHei UI', 10),
+                       foreground='#27ae60',
+                       background='#f8f9fa')
+        
+        style.configure('Card.TFrame',
+                       background='#ffffff',
+                       relief='flat',
+                       borderwidth=1)
+
+    def center_window(self):
+        """窗口居中显示"""
+        self.root.update_idletasks()
+        width = self.root.winfo_width()
+        height = self.root.winfo_height()
+        x = (self.root.winfo_screenwidth() // 2) - (width // 2)
+        y = (self.root.winfo_screenheight() // 2) - (height // 2)
+        self.root.geometry(f'{width}x{height}+{x}+{y}')
+
     def setup_ui(self):
         """设置用户界面"""
-        # 主框架
-        main_frame = ttk.Frame(self.root, padding="10")
-        main_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+        # 主容器
+        main_container = tk.Frame(self.root, bg='#f8f9fa')
+        main_container.pack(fill=tk.BOTH, expand=True, padx=30, pady=30)
 
-        # 配置权重
-        self.root.columnconfigure(0, weight=1)
-        self.root.rowconfigure(0, weight=1)
-        main_frame.columnconfigure(1, weight=1)
-        main_frame.rowconfigure(2, weight=1)
-        
-        # 初始化profit_tree
-        self.profit_tree = None
+        # 标题区域
+        header_frame = tk.Frame(main_container, bg='#f8f9fa', height=100)
+        header_frame.pack(fill=tk.X, pady=(0, 30))
+        header_frame.pack_propagate(False)
 
-        # 标题
-        title_label = ttk.Label(main_frame, text="毛利表生成器", font=("Arial", 16, "bold"))
-        title_label.grid(row=0, column=0, columnspan=3, pady=(0, 20))
+        # 主标题
+        title_label = ttk.Label(header_frame, text="毛利表生成器", style='Title.TLabel')
+        title_label.pack(pady=(20, 5))
 
-        # 按钮框架
-        button_frame = ttk.Frame(main_frame)
-        button_frame.grid(row=1, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=(0, 10))
+        # 副标题
+        subtitle_label = ttk.Label(header_frame, text="专业的Excel数据处理与毛利分析工具", style='Subtitle.TLabel')
+        subtitle_label.pack()
 
-        # 功能按钮
-        ttk.Button(button_frame, text="导入Excel数据", command=self.import_data, width=20).pack(side=tk.LEFT)
-        ttk.Button(button_frame, text="导出毛利表", command=self.export_excel, width=20).pack(side=tk.LEFT, padx=(10, 0))
-        ttk.Button(button_frame, text="导入更新后的毛利表", command=self.import_modified_prices, width=25).pack(side=tk.LEFT, padx=(10, 0))
-        ttk.Button(button_frame, text="导出改价后原始数据", command=self.export_original_data, width=25).pack(side=tk.LEFT, padx=(10, 0))
+        # 功能卡片区域
+        cards_frame = tk.Frame(main_container, bg='#f8f9fa')
+        cards_frame.pack(fill=tk.X, pady=(0, 20))
 
-        # 状态标签
-        self.status_label = ttk.Label(button_frame, text="请导入数据文件", foreground="blue")
-        self.status_label.pack(side=tk.LEFT, padx=(20, 0))
+        # 创建功能卡片
+        self.create_function_cards(cards_frame)
+
+        # 状态栏
+        status_frame = tk.Frame(main_container, bg='#f8f9fa', height=40)
+        status_frame.pack(fill=tk.X, pady=(0, 20))
+        status_frame.pack_propagate(False)
+
+        self.status_label = ttk.Label(status_frame, text="● 就绪 - 请导入Excel数据文件开始处理", style='Status.TLabel')
+        self.status_label.pack(pady=10)
+
+        # 数据展示区域
+        content_frame = ttk.Frame(main_container, style='Card.TFrame')
+        content_frame.pack(fill=tk.BOTH, expand=True)
 
         # 创建Notebook用于标签页
-        self.notebook = ttk.Notebook(main_frame)
-        self.notebook.grid(row=2, column=0, columnspan=3, sticky=(tk.W, tk.E, tk.N, tk.S), pady=(0, 10))
+        self.notebook = ttk.Notebook(content_frame)
+        self.notebook.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
 
         # 毛利表标签页
         self.profit_frame = ttk.Frame(self.notebook)
-        self.notebook.add(self.profit_frame, text="毛利表")
+        self.notebook.add(self.profit_frame, text="📊 毛利表数据")
 
         # 创建数据表格
         self.setup_data_tables()
+
+    def create_function_cards(self, parent):
+        """创建功能卡片"""
+        # 卡片容器
+        cards_container = tk.Frame(parent, bg='#f8f9fa')
+        cards_container.pack(expand=True)
+
+        # 卡片数据
+        cards_data = [
+            {
+                'title': '📁 导入数据',
+                'desc': '导入Excel原始数据',
+                'command': self.import_data,
+                'color': '#3498db'
+            },
+            {
+                'title': '📊 导出毛利表',
+                'desc': '生成标准毛利表',
+                'command': self.export_excel,
+                'color': '#2ecc71'
+            },
+            {
+                'title': '🔄 更新价格',
+                'desc': '导入修改后毛利表',
+                'command': self.import_modified_prices,
+                'color': '#f39c12'
+            },
+            {
+                'title': '💾 导出数据',
+                'desc': '导出改价后数据',
+                'command': self.export_original_data,
+                'color': '#9b59b6'
+            }
+        ]
+
+        # 创建卡片
+        for i, card in enumerate(cards_data):
+            card_frame = tk.Frame(cards_container, bg='#ffffff', relief='flat', bd=1)
+            card_frame.grid(row=0, column=i, padx=15, pady=10, sticky='ew')
+            
+            # 卡片内容
+            title_label = tk.Label(card_frame, text=card['title'], 
+                                 font=('Microsoft YaHei UI', 12, 'bold'),
+                                 fg=card['color'], bg='#ffffff')
+            title_label.pack(pady=(20, 5))
+            
+            desc_label = tk.Label(card_frame, text=card['desc'],
+                                font=('Microsoft YaHei UI', 9),
+                                fg='#7f8c8d', bg='#ffffff')
+            desc_label.pack(pady=(0, 10))
+            
+            # 按钮
+            btn = tk.Button(card_frame, text='执行',
+                          command=card['command'],
+                          font=('Microsoft YaHei UI', 9),
+                          bg=card['color'], fg='white',
+                          relief='flat', padx=20, pady=8,
+                          cursor='hand2')
+            btn.pack(pady=(0, 20))
+            
+            # 鼠标悬停效果
+            def on_enter(e, color=card['color']):
+                e.widget.configure(bg=self.darken_color(color))
+            
+            def on_leave(e, color=card['color']):
+                e.widget.configure(bg=color)
+            
+            btn.bind('<Enter>', on_enter)
+            btn.bind('<Leave>', on_leave)
+
+        # 配置网格权重
+        for i in range(4):
+            cards_container.grid_columnconfigure(i, weight=1)
+
+    def darken_color(self, color):
+        """颜色加深效果"""
+        color_map = {
+            '#3498db': '#2980b9',
+            '#2ecc71': '#27ae60',
+            '#f39c12': '#e67e22',
+            '#9b59b6': '#8e44ad'
+        }
+        return color_map.get(color, color)
 
     def setup_data_tables(self):
         """设置数据表格"""
