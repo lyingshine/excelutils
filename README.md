@@ -1,220 +1,215 @@
-# 毛利表生成器 (Excel Utils)
+# Excel 毛利表生成器
 
-[![Python](https://img.shields.io/badge/Python-3.7+-blue.svg)](https://www.python.org/downloads/)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Status](https://img.shields.io/badge/Status-Production-brightgreen.svg)]()
+一个智能的Excel数据处理工具，专门用于生成和管理产品毛利表。支持从原始数据自动生成毛利表，以及根据修改后的毛利表反向生成改价后的原始数据。
 
-一个专业的Excel数据处理工具，专门用于自动生成和管理商品毛利表，特别适用于自行车等商品的价格管理和毛利分析。
+## 🚀 核心功能
 
-## 🚀 功能特性
+### 1. 智能数据处理
+- **动态尺寸识别**：自动识别任何"数字+寸"格式的尺寸（如16寸、27.5寸、30寸等）
+- **智能格式切换**：当尺寸项多于速别项时，自动切换到尺寸格式显示
+- **配置信息提取**：从商品简称中自动提取配置、尺寸、速别、颜色等信息
 
-### 核心功能
-- **📊 数据导入** - 支持Excel格式的原始商品数据导入
-- **🔍 智能处理** - 自动提取商品配置、尺寸(24寸/26寸/27.5寸)、速别、颜色等信息
-- **📈 毛利表生成** - 按配置分组生成标准化毛利表
-- **💰 价格更新** - 支持导入修改后的毛利表，自动更新原始数据价格
-- **📏 多尺寸支持** - 智能处理不同规格，27.5寸商品自动加价20元
+### 2. 毛利表生成
+- **原始数据 → 毛利表**：从导入的原始数据生成标准化毛利表
+- **双格式支持**：
+  - **速别格式**：当速别项 ≥ 尺寸项时使用，按速别列显示
+  - **尺寸格式**：当尺寸项 > 速别项时使用，按尺寸列显示，速别信息拼接到配置名中
 
-### 智能算法
-- **价格匹配逻辑**：直接匹配 → 尺寸规范化匹配 → 自动价格调整
-- **数据筛选规则**：优先26寸规格 → 同配置最低价格 → 自动去重排序
-- **配置提取算法**：从商品简称中智能提取配置、尺寸、速别信息
+### 3. 反向价格更新
+- **毛利表 → 原始数据**：根据修改后的毛利表生成改价后的原始数据表
+- **价格同步**：自动将毛利表中的价格调整同步到原始数据
 
-## 🏗️ 项目架构
+### 4. Excel 格式化
+- **专业排版**：自动设置列宽、字体、对齐方式
+- **智能合并**：根据数据格式自动合并相应的表头单元格
+- **条件格式**：为不同数据类型应用合适的格式
+
+## 📁 项目结构
 
 ```
 excelutils/
-├── 📄 main.py                    # 主程序入口
-├── 📄 启动毛利表生成器.bat        # 快速启动脚本
-├── 📄 requirements.txt           # 依赖包列表
-│
-├── 📂 processors/                # 数据处理器模块
-│   └── data_processor.py         # 核心数据处理器
-│
-├── 📂 exporters/                 # 导出器模块
-│   └── excel_exporter.py         # Excel导出功能
-│
-├── 📂 cli/                       # 命令行工具模块
-│   └── generate_profit_table.py  # 命令行版本
-│
-├── 📂 core/                      # 核心业务逻辑层
-│   ├── data_extractor.py         # 数据提取器
-│   ├── data_filter.py            # 数据筛选器
-│   ├── price_matcher.py          # 价格匹配器
-│   └── profit_calculator.py      # 毛利计算器
-│
-├── 📂 services/                  # 业务服务层
-│   ├── data_service.py           # 数据服务
-│   └── excel_service.py          # Excel服务
-│
-├── 📂 models/                    # 数据模型层
-│   └── data_models.py            # 数据结构定义
-│
-├── 📂 app/                       # 应用程序层
-│   └── application.py            # 应用程序主类
-│
-├── 📂 gui/                       # 用户界面层
-│   └── main_window.py            # GUI界面
-│
-├── 📂 utils/                     # 工具类
-│   └── logger.py                 # 日志工具
-│
-├── 📂 config/                    # 配置管理
-│   └── settings.py               # 配置文件
-│
-└── 📂 logs/                      # 日志目录
-    └── app.log                   # 应用日志
+├── main.py                 # 主程序入口
+├── 启动毛利表生成器.bat      # Windows启动脚本
+├── requirements.txt        # 依赖包列表
+├── README.md              # 项目说明文档
+├── CHANGELOG.md           # 更新日志
+├── app/                   # 应用程序模块
+├── cli/                   # 命令行接口
+├── config/                # 配置文件
+│   └── settings.py        # 主配置文件
+├── core/                  # 核心功能模块
+│   ├── data_extractor.py  # 数据提取器
+│   ├── data_filter.py     # 数据筛选器
+│   ├── profit_calculator.py # 毛利计算器
+│   ├── price_matcher.py   # 价格匹配器
+│   └── table_format_analyzer.py # 表格格式分析器
+├── data/                  # 数据文件目录
+├── exporters/             # 导出器模块
+│   └── excel_exporter.py  # Excel导出器
+├── gui/                   # 图形界面模块
+├── logs/                  # 日志文件目录
+├── models/                # 数据模型
+├── processors/            # 数据处理器
+│   └── data_processor.py  # 主数据处理器
+├── services/              # 服务层
+│   ├── data_service.py    # 数据服务
+│   └── excel_service.py   # Excel服务
+└── utils/                 # 工具模块
+    └── logger.py          # 日志工具
 ```
 
 ## 🛠️ 安装与使用
 
 ### 环境要求
-- Python 3.7+
-- Windows/macOS/Linux
+- Python 3.8+
+- Windows 10/11（推荐）
 
-### 快速开始
+### 安装步骤
 
 1. **克隆项目**
-```bash
-git clone <repository-url>
-cd excelutils
-```
+   ```bash
+   git clone <repository-url>
+   cd excelutils
+   ```
 
 2. **安装依赖**
-```bash
-pip install -r requirements.txt
-```
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-3. **启动应用**
+3. **准备数据**
+   - 将原始数据文件命名为 `导入数据.xlsx` 并放在项目根目录
+   - 确保数据包含 `简称`、`分类`、`价格` 等必要列
 
-**GUI版本（推荐）**：
+### 使用方法
+
+#### 方法一：双击启动（推荐）
+直接双击 `启动毛利表生成器.bat` 文件
+
+#### 方法二：命令行启动
 ```bash
 python main.py
-# 或双击运行
-启动毛利表生成器.bat
 ```
 
-**命令行版本**：
-```bash
-python cli/generate_profit_table.py
-```
+### 操作流程
 
-### 使用流程
+1. **生成毛利表**
+   - 程序自动读取 `导入数据.xlsx`
+   - 智能分析数据特征，选择合适的显示格式
+   - 生成 `毛利表.xlsx` 文件
 
-1. **准备数据** - 将商品数据整理为Excel格式，包含ID、简称、价格、成本等列
-2. **导入数据** - 使用GUI或命令行导入Excel文件
-3. **生成毛利表** - 系统自动处理数据并生成毛利表
-4. **调整价格** - 在生成的毛利表中修改价格（可选）
-5. **更新原数据** - 导入修改后的毛利表，更新原始数据价格
+2. **修改毛利表**
+   - 打开生成的 `毛利表.xlsx`
+   - 修改需要调整的价格
+   - 保存文件
 
-## 💻 开发指南
+3. **生成改价数据**
+   - 重新运行程序
+   - 程序检测到毛利表存在，自动生成 `改价后数据.xlsx`
 
-### 模块化架构
+## 📊 数据格式说明
 
-项目采用现代化的分层架构设计：
+### 输入数据格式
+原始数据文件应包含以下列：
+- `简称`：产品完整名称（如：YJ-FT芭蕾顶配24寸变速）
+- `分类`：产品分类
+- `价格`：产品价格
+- 其他相关列...
 
-- **models/** - 数据模型定义
-- **core/** - 核心业务逻辑实现
-- **services/** - 业务服务层，整合核心功能
-- **processors/exporters/cli/** - 功能模块，按类型分类
-- **app/gui/** - 应用程序层和用户界面
+### 输出格式
 
-### API使用示例
+#### 速别格式（速别项 ≥ 尺寸项）
+| 配置 | 速别 | 20寸 | 22寸 | 24寸 | 26寸 | 毛利 |
+|------|------|------|------|------|------|------|
+| 顶配 | 单速 | 1200 | 1300 | 1400 | 1500 | 25% |
+| 顶配 | 变速 | 1400 | 1500 | 1600 | 1700 | 28% |
+
+#### 尺寸格式（尺寸项 > 速别项）
+| 配置 | 尺寸 | 价格1 | 价格2 | 价格3 | 毛利 |
+|------|------|-------|-------|-------|------|
+| 顶配单速 | 20寸 | 1200 | 1250 | 1300 | 25% |
+| 顶配变速 | 20寸 | 1400 | 1450 | 1500 | 28% |
+
+## ⚙️ 配置说明
+
+### 主要配置项（config/settings.py）
 
 ```python
-# 使用数据处理器
-from processors.data_processor import DataProcessor
+# 数据处理配置
+DATA_PROCESSING_CONFIG = {
+    'size_price_adjustments': {
+        '20寸': -50,    # 20寸产品价格调整
+        '22寸': -30,    # 22寸产品价格调整
+        '24寸': 0,      # 24寸产品价格调整（基准）
+        '26寸': 20,     # 26寸产品价格调整
+        # ... 更多尺寸配置
+    }
+}
 
-processor = DataProcessor()
-data = processor.import_excel_data("data.xlsx")
-processed_data = processor.process_data(data)
-profit_table = processor.generate_profit_table(processed_data)
-
-# 使用服务层
-from services.data_service import DataService
-
-service = DataService()
-result = service.process_complete_workflow("data.xlsx")
-
-# 使用核心组件
-from core.data_extractor import DataExtractor
-from core.profit_calculator import ProfitCalculator
-
-extractor = DataExtractor()
-calculator = ProfitCalculator()
+# Excel导出配置
+EXCEL_EXPORT_CONFIG = {
+    'column_width': 15,           # 默认列宽
+    'font_name': '微软雅黑',       # 字体名称
+    'font_size': 10,             # 字体大小
+    'header_font_size': 11,      # 表头字体大小
+}
 ```
 
-### 扩展开发
+## 🔧 高级功能
 
-1. **添加新的数据提取规则** - 修改 `core/data_extractor.py`
-2. **自定义筛选逻辑** - 扩展 `core/data_filter.py`
-3. **新增导出格式** - 在 `exporters/` 中添加新的导出器
-4. **创建新的CLI工具** - 在 `cli/` 中添加新的命令行工具
+### 1. 智能格式分析
+系统会自动分析数据特征：
+- 统计尺寸项和速别项的数量
+- 根据数量关系选择最优显示格式
+- 确保数据展示的清晰性和可读性
 
-## 📊 核心算法
+### 2. 动态尺寸识别
+- 使用正则表达式 `(\d+(?:\.\d+)?寸)` 识别尺寸
+- 支持整数尺寸（如20寸、24寸）
+- 支持小数尺寸（如27.5寸）
+- 自动按数值大小排序
 
-### 价格匹配算法
-```
-1. 直接用简称匹配毛利表
-2. 失败时将24寸、27.5寸规范化为26寸再匹配
-3. 27.5寸商品在26寸价格基础上加20元
-4. 记录详细匹配日志
-```
+### 3. 价格匹配算法
+- 基于配置、尺寸、速别的多维度匹配
+- 支持模糊匹配和精确匹配
+- 自动处理价格调整和同步
 
-### 数据筛选规则
-```
-1. 优先保留26寸规格数据
-2. 同配置多价格时选择最低价格
-3. 自动去重和数据清洗
-4. 按配置最高价格升序排列
-```
+## 📝 日志系统
 
-## 🔧 技术栈
+程序运行时会在 `logs/` 目录下生成详细的日志文件：
+- 数据处理过程记录
+- 错误信息和警告
+- 性能统计信息
 
-- **核心语言**: Python 3.7+
-- **数据处理**: pandas, openpyxl
-- **用户界面**: tkinter
-- **日志系统**: logging
-- **架构模式**: 分层架构, 服务层模式
-- **设计原则**: 单一职责, 依赖注入, 开闭原则
+## 🐛 常见问题
 
-## 📝 更新日志
+### Q1: 程序无法识别某些尺寸？
+**A**: 确保尺寸格式为"数字+寸"（如24寸、27.5寸）。程序会自动识别所有符合此格式的尺寸。
 
-### v2.0.0 (2025-09-22)
-- 🎉 **重大重构**: 采用现代化模块架构
-- ✨ **新增功能**: 分层服务架构，提高代码复用性
-- 🔧 **优化**: 按功能类型重新组织代码结构
-- 📚 **改进**: 完善文档和类型注解
-- 🐛 **修复**: 解决导入路径和兼容性问题
+### Q2: 毛利表格式不正确？
+**A**: 检查原始数据中的简称格式，确保包含完整的配置、尺寸、速别信息。
 
-### v1.0.0
-- 🎉 初始版本发布
-- ✨ 基础毛利表生成功能
-- 📊 Excel数据导入导出
-- 🖥️ GUI用户界面
+### Q3: 改价后数据生成失败？
+**A**: 确保毛利表文件存在且格式正确，检查是否有必要的列（配置、尺寸/速别、价格等）。
 
-## 🤝 贡献指南
+## 🔄 更新日志
 
-1. Fork 项目
-2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 开启 Pull Request
+详见 [CHANGELOG.md](CHANGELOG.md)
 
 ## 📄 许可证
 
-本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情
+本项目采用 MIT 许可证 - 详见 LICENSE 文件
 
-## 🆘 支持与反馈
+## 🤝 贡献
 
-- 📧 邮箱: [your-email@example.com]
-- 🐛 问题反馈: [GitHub Issues](https://github.com/your-username/excelutils/issues)
-- 📖 文档: [项目Wiki](https://github.com/your-username/excelutils/wiki)
+欢迎提交 Issue 和 Pull Request 来改进这个项目！
 
-## 🙏 致谢
+## 📞 支持
 
-感谢所有为这个项目做出贡献的开发者和用户！
+如有问题或建议，请通过以下方式联系：
+- 提交 GitHub Issue
+- 发送邮件至项目维护者
 
 ---
 
-**毛利表生成器** - 让商品价格管理更简单、更智能！ 🚀
+**注意**：本工具专为Excel数据处理设计，请确保输入数据格式正确以获得最佳效果。

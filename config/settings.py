@@ -26,16 +26,20 @@ EXCEL_CONFIG = {
 
 # 数据处理配置
 DATA_PROCESSING_CONFIG = {
-    "size_patterns": [r'24寸', r'26寸', r'27\.5寸'],
+    "size_patterns": [r'20寸', r'22寸', r'24寸', r'26寸', r'27\.5寸', r'28寸', r'29寸'],
     "speed_pattern": r'(\d+速)',
     "color_patterns": [r'黑', r'白', r'红', r'蓝', r'绿', r'黄', r'灰', r'银', r'金', r'粉', r'紫', r'橙'],
     "default_size": "26寸",
     "default_speed": "21速",
     "default_color": "渐变色",
     "price_adjustments": {
+        "20寸": -40,
+        "22寸": -20,
         "24寸": 0,
         "26寸": 0,
-        "27.5寸": 20
+        "27.5寸": 20,
+        "28寸": 30,
+        "29寸": 40
     }
 }
 

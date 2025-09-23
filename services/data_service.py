@@ -84,8 +84,14 @@ class DataService:
     def generate_profit_table(self, df: pd.DataFrame) -> pd.DataFrame:
         """生成毛利表"""
         try:
-            # 应用数据筛选规则
-            df_filtered = self.data_filter.apply_data_filtering_rules(df)
+            # 先分析数据特征，决定使用哪种格式
+            from core.table_format_analyzer import TableFormatAnalyzer
+            analyzer = TableFormatAnalyzer()
+            analysis = analyzer.analyze_data_characteristics(df)
+            use_size_format = analysis['should_use_size_format']
+            
+            # 应用数据筛选规则，传递格式信息
+            df_filtered = self.data_filter.apply_data_filtering_rules(df, use_size_format)
             
             # 生成毛利表
             profit_table = self.profit_calculator.generate_profit_table(df_filtered)

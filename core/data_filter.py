@@ -23,8 +23,13 @@ class DataFilter:
     def __init__(self):
         pass
 
-    def apply_data_filtering_rules(self, df: pd.DataFrame) -> pd.DataFrame:
-        """应用数据筛选规则"""
+    def apply_data_filtering_rules(self, df: pd.DataFrame, use_size_format: bool = False) -> pd.DataFrame:
+        """应用数据筛选规则
+        
+        Args:
+            df: 输入数据
+            use_size_format: 是否使用尺寸格式，如果为True则不进行尺寸筛选
+        """
         try:
             filtered_data = []
 
@@ -50,28 +55,36 @@ class DataFilter:
 
                 config_data = df[df['配置颜色组合'] == combo].copy()
 
-                # 规则2：所有配置只保留26寸的数据
-                if '26寸' in config_data['尺寸'].values:
-                    config_data_26 = config_data[config_data['尺寸'] == '26寸']
-                    if not config_data_26.empty:
-                        config_data = config_data_26
-                else:
-                    # 如果没有26寸，选择成本最高的尺寸
-                    if '成本' in config_data.columns and not config_data['成本'].empty:
-                        try:
-                            config_data['成本数值'] = pd.to_numeric(config_data['成本'], errors='coerce')
-                            size_max_costs = config_data.groupby('尺寸')['成本数值'].max()
-                            if not size_max_costs.empty:
-                                max_cost_size = size_max_costs.idxmax()
-                                config_data = config_data[config_data['尺寸'] == max_cost_size]
-                        except:
-                            first_size = config_data['尺寸'].iloc[0] if not config_data['尺寸'].empty else ''
-                            if first_size:
-                                config_data = config_data[config_data['尺寸'] == first_size]
+                # 规则2：如果不是尺寸格式，才进行尺寸筛选
+                if not use_size_format:
+                    # 所有配置只保留26寸的数据
+                    if '26寸' in config_data['尺寸'].values:
+                        config_data_26 = config_data[config_data['尺寸'] == '26寸']
+                        if not config_data_26.empty:
+                            config_data = config_data_26
+                    else:
+                        # 如果没有26寸，选择成本最高的尺寸
+                        if '成本' in config_data.columns and not config_data['成本'].empty:
+                            try:
+                                config_data['成本数值'] = pd.to_numeric(config_data['成本'], errors='coerce')
+                                size_max_costs = config_data.groupby('尺寸')['成本数值'].max()
+                                if not size_max_costs.empty:
+                                    max_cost_size = size_max_costs.idxmax()
+                                    config_data = config_data[config_data['尺寸'] == max_cost_size]
+                            except:
+                                first_size = config_data['尺寸'].iloc[0] if not config_data['尺寸'].empty else ''
+                                if first_size:
+                                    config_data = config_data[config_data['尺寸'] == first_size]
 
                 # 规则4：选择最低价格的数据
                 if '价格' in config_data.columns and not config_data.empty:
-                    grouped = config_data.groupby(['配置', '尺寸', '速别'])
+                    if use_size_format:
+                        # 尺寸格式：按配置、尺寸、速别分组（保留不同速别的数据）
+                        grouped = config_data.groupby(['配置', '尺寸', '速别'])
+                    else:
+                        # 速别格式：按配置、尺寸、速别分组
+                        grouped = config_data.groupby(['配置', '尺寸', '速别'])
+                    
                     for group_key, group_data in grouped:
                         if len(group_data) > 1:
                             try:

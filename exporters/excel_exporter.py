@@ -42,6 +42,7 @@ class ExcelExporter:
         self.profit_table_widths = {
             '配置': 25,
             '速别': 15,
+            '尺寸': 15,  # 新增尺寸列宽度设置
             '简称': 45,
             '价格': 15,
             '成本': 15,
@@ -90,8 +91,13 @@ class ExcelExporter:
 
     def _reorder_profit_table_columns(self, profit_table: pd.DataFrame) -> pd.DataFrame:
         """重新排列毛利表列顺序，将简称列移到最右侧"""
-        # 定义期望的列顺序（简称放在最后）
-        desired_order = ['配置', '速别', '价格', '成本', '快递', '毛利润', '毛利率', '简称']
+        # 根据实际存在的列来决定顺序
+        if '尺寸' in profit_table.columns:
+            # 尺寸格式：使用尺寸列替代速别列
+            desired_order = ['配置', '尺寸', '价格', '成本', '快递', '毛利润', '毛利率', '简称']
+        else:
+            # 默认速别格式
+            desired_order = ['配置', '速别', '价格', '成本', '快递', '毛利润', '毛利率', '简称']
         
         # 获取实际存在的列
         existing_cols = [col for col in desired_order if col in profit_table.columns]
@@ -149,6 +155,7 @@ class ExcelExporter:
         # 找到各列的索引
         config_col = profit_table.columns.get_loc('配置') + 1 if '配置' in profit_table.columns else None
         speed_col = profit_table.columns.get_loc('速别') + 1 if '速别' in profit_table.columns else None
+        size_col = profit_table.columns.get_loc('尺寸') + 1 if '尺寸' in profit_table.columns else None
         name_col = profit_table.columns.get_loc('简称') + 1 if '简称' in profit_table.columns else None
         price_col = profit_table.columns.get_loc('价格') + 1 if '价格' in profit_table.columns else None
         cost_col = profit_table.columns.get_loc('成本') + 1 if '成本' in profit_table.columns else None
@@ -156,12 +163,18 @@ class ExcelExporter:
         profit_amount_col = profit_table.columns.get_loc('毛利润') + 1 if '毛利润' in profit_table.columns else None
         profit_rate_col = profit_table.columns.get_loc('毛利率') + 1 if '毛利率' in profit_table.columns else None
         
-        # 合并配置、速别、价格列的第一行和第二行单元格，并设置表头名称
+        # 合并配置、速别/尺寸、价格列的第一行和第二行单元格，并设置表头名称
         merge_cols_info = [
             (config_col, '配置'),
-            (speed_col, '速别'), 
             (price_col, '价格')
         ]
+        
+        # 根据表格中实际存在的列来决定合并速别还是尺寸
+        if speed_col is not None:
+            merge_cols_info.append((speed_col, '速别'))
+        elif size_col is not None:
+            merge_cols_info.append((size_col, '尺寸'))
+        
         for col_idx, col_name in merge_cols_info:
             if col_idx is not None:
                 try:

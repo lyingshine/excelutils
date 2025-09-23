@@ -22,7 +22,8 @@ class DataExtractor:
     """数据提取器类，负责从商品名称中提取各种信息"""
     
     def __init__(self):
-        self.size_patterns = [r'24寸', r'26寸', r'27\.5寸']
+        # 使用动态正则表达式识别所有数字+寸的格式
+        self.size_pattern = r'(\d+(?:\.\d+)?寸)'  # 匹配整数或小数+寸，如：20寸、27.5寸
         self.speed_pattern = r'(\d+速)'
         self.color_patterns = [r'黑', r'白', r'红', r'蓝', r'绿', r'黄', r'灰', r'银', r'金', r'粉', r'紫', r'橙']
 
@@ -50,13 +51,11 @@ class DataExtractor:
             size_start = -1
             size_end = -1
 
-            for pattern in self.size_patterns:
-                match = re.search(pattern, name)
-                if match:
-                    size_match = match.group()
-                    size_start = match.start()
-                    size_end = match.end()
-                    break
+            match = re.search(self.size_pattern, name)
+            if match:
+                size_match = match.group(1)  # 获取捕获组中的尺寸
+                size_start = match.start()
+                size_end = match.end()
 
             # 查找速别 - 使用新的提取逻辑
             speed_text = self.extract_speed_from_name(name)
@@ -173,13 +172,12 @@ class DataExtractor:
 
     def extract_config_from_name(self, name: str, category: str) -> str:
         """从商品简称中提取配置"""
-        for pattern in self.size_patterns:
-            match = re.search(pattern, name)
-            if match and category in name:
-                category_end = name.find(category) + len(category)
-                size_start = match.start()
-                config = name[category_end:size_start]
-                return config
+        match = re.search(self.size_pattern, name)
+        if match and category in name:
+            category_end = name.find(category) + len(category)
+            size_start = match.start()
+            config = name[category_end:size_start]
+            return config
         return ''
 
     def extract_speed_from_name(self, name: str) -> str:
@@ -210,10 +208,9 @@ class DataExtractor:
 
     def extract_size_from_name(self, name: str) -> str:
         """从商品简称中提取尺寸"""
-        for pattern in self.size_patterns:
-            match = re.search(pattern, name)
-            if match:
-                return match.group()
+        match = re.search(self.size_pattern, name)
+        if match:
+            return match.group(1)  # 返回捕获组中的内容
         return ''
 
     def remove_size_from_name(self, name: str) -> str:
